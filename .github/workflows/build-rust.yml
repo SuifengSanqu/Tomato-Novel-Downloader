@@ -22,6 +22,22 @@ jobs:
       - name: Checkout A Repository
         uses: actions/checkout@v4
 
+      - name: Create API crate stub (ensures path resolution)
+        shell: bash
+        run: |
+          mkdir -p ../Tomato-Novel-Official-API/src
+          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
+          [package]
+          name = "tomato-novel-official-api"
+          version = "0.1.0"
+          edition = "2021"
+          [dependencies]
+          serde = { version = "1", features = ["derive"] }
+          serde_json = "1"
+          anyhow = "1"
+          STUB_EOF
+          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
+
       - name: Checkout Tomato-Novel-Official-API (private)
         uses: actions/checkout@v4
         with:
@@ -102,6 +118,22 @@ jobs:
     steps:
       - name: Checkout A Repository
         uses: actions/checkout@v4
+
+      - name: Create API crate stub (ensures path resolution)
+        shell: bash
+        run: |
+          mkdir -p ../Tomato-Novel-Official-API/src
+          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
+          [package]
+          name = "tomato-novel-official-api"
+          version = "0.1.0"
+          edition = "2021"
+          [dependencies]
+          serde = { version = "1", features = ["derive"] }
+          serde_json = "1"
+          anyhow = "1"
+          STUB_EOF
+          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
 
       - name: Checkout Tomato-Novel-Official-API (private)
         uses: actions/checkout@v4
@@ -193,6 +225,22 @@ jobs:
       - name: Checkout A Repository
         uses: actions/checkout@v4
 
+      - name: Create API crate stub (ensures path resolution)
+        shell: bash
+        run: |
+          mkdir -p ../Tomato-Novel-Official-API/src
+          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
+          [package]
+          name = "tomato-novel-official-api"
+          version = "0.1.0"
+          edition = "2021"
+          [dependencies]
+          serde = { version = "1", features = ["derive"] }
+          serde_json = "1"
+          anyhow = "1"
+          STUB_EOF
+          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
+
       - name: Checkout Tomato-Novel-Official-API (private)
         uses: actions/checkout@v4
         with:
@@ -283,6 +331,22 @@ jobs:
       - name: Checkout A Repository
         uses: actions/checkout@v4
 
+      - name: Create API crate stub (ensures path resolution)
+        shell: bash
+        run: |
+          mkdir -p ../Tomato-Novel-Official-API/src
+          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
+          [package]
+          name = "tomato-novel-official-api"
+          version = "0.1.0"
+          edition = "2021"
+          [dependencies]
+          serde = { version = "1", features = ["derive"] }
+          serde_json = "1"
+          anyhow = "1"
+          STUB_EOF
+          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
+
       - name: Checkout Tomato-Novel-Official-API (private)
         uses: actions/checkout@v4
         with:
@@ -363,6 +427,22 @@ jobs:
     steps:
       - name: Checkout A Repository
         uses: actions/checkout@v4
+
+      - name: Create API crate stub (ensures path resolution)
+        shell: bash
+        run: |
+          mkdir -p ../Tomato-Novel-Official-API/src
+          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
+          [package]
+          name = "tomato-novel-official-api"
+          version = "0.1.0"
+          edition = "2021"
+          [dependencies]
+          serde = { version = "1", features = ["derive"] }
+          serde_json = "1"
+          anyhow = "1"
+          STUB_EOF
+          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
 
       - name: Checkout Tomato-Novel-Official-API (private)
         uses: actions/checkout@v4
@@ -473,6 +553,22 @@ jobs:
       - name: Checkout A Repository
         uses: actions/checkout@v4
 
+      - name: Create API crate stub (ensures path resolution)
+        shell: bash
+        run: |
+          mkdir -p ../Tomato-Novel-Official-API/src
+          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
+          [package]
+          name = "tomato-novel-official-api"
+          version = "0.1.0"
+          edition = "2021"
+          [dependencies]
+          serde = { version = "1", features = ["derive"] }
+          serde_json = "1"
+          anyhow = "1"
+          STUB_EOF
+          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
+
       - name: Checkout Tomato-Novel-Official-API (private)
         uses: actions/checkout@v4
         with:
@@ -582,6 +678,22 @@ jobs:
       - name: Checkout A Repository
         uses: actions/checkout@v4
 
+      - name: Create API crate stub (ensures path resolution)
+        shell: bash
+        run: |
+          mkdir -p ../Tomato-Novel-Official-API/src
+          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
+          [package]
+          name = "tomato-novel-official-api"
+          version = "0.1.0"
+          edition = "2021"
+          [dependencies]
+          serde = { version = "1", features = ["derive"] }
+          serde_json = "1"
+          anyhow = "1"
+          STUB_EOF
+          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
+
       - name: Checkout Tomato-Novel-Official-API (private)
         uses: actions/checkout@v4
         with:
@@ -663,6 +775,22 @@ jobs:
     steps:
       - name: Checkout A Repository
         uses: actions/checkout@v4
+
+      - name: Create API crate stub (ensures path resolution)
+        shell: bash
+        run: |
+          mkdir -p ../Tomato-Novel-Official-API/src
+          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
+          [package]
+          name = "tomato-novel-official-api"
+          version = "0.1.0"
+          edition = "2021"
+          [dependencies]
+          serde = { version = "1", features = ["derive"] }
+          serde_json = "1"
+          anyhow = "1"
+          STUB_EOF
+          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
 
       - name: Checkout Tomato-Novel-Official-API (private)
         uses: actions/checkout@v4
@@ -746,6 +874,22 @@ jobs:
       - name: Checkout A Repository
         uses: actions/checkout@v4
 
+      - name: Create API crate stub (ensures path resolution)
+        shell: bash
+        run: |
+          mkdir -p ../Tomato-Novel-Official-API/src
+          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
+          [package]
+          name = "tomato-novel-official-api"
+          version = "0.1.0"
+          edition = "2021"
+          [dependencies]
+          serde = { version = "1", features = ["derive"] }
+          serde_json = "1"
+          anyhow = "1"
+          STUB_EOF
+          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
+
       - name: Checkout Tomato-Novel-Official-API (private)
         uses: actions/checkout@v4
         with:
@@ -826,6 +970,22 @@ jobs:
     steps:
       - name: Checkout A Repository
         uses: actions/checkout@v4
+
+      - name: Create API crate stub (ensures path resolution)
+        shell: bash
+        run: |
+          mkdir -p ../Tomato-Novel-Official-API/src
+          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
+          [package]
+          name = "tomato-novel-official-api"
+          version = "0.1.0"
+          edition = "2021"
+          [dependencies]
+          serde = { version = "1", features = ["derive"] }
+          serde_json = "1"
+          anyhow = "1"
+          STUB_EOF
+          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
 
       - name: Checkout Tomato-Novel-Official-API (private)
         uses: actions/checkout@v4
@@ -1030,6 +1190,22 @@ jobs:
       - name: Checkout A Repository
         uses: actions/checkout@v4
 
+      - name: Create API crate stub (ensures path resolution)
+        shell: bash
+        run: |
+          mkdir -p ../Tomato-Novel-Official-API/src
+          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
+          [package]
+          name = "tomato-novel-official-api"
+          version = "0.1.0"
+          edition = "2021"
+          [dependencies]
+          serde = { version = "1", features = ["derive"] }
+          serde_json = "1"
+          anyhow = "1"
+          STUB_EOF
+          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
+
       - name: Checkout Tomato-Novel-Official-API (private)
         uses: actions/checkout@v4
         with:
@@ -1091,6 +1267,22 @@ jobs:
     steps:
       - name: Checkout A Repository
         uses: actions/checkout@v4
+
+      - name: Create API crate stub (ensures path resolution)
+        shell: bash
+        run: |
+          mkdir -p ../Tomato-Novel-Official-API/src
+          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
+          [package]
+          name = "tomato-novel-official-api"
+          version = "0.1.0"
+          edition = "2021"
+          [dependencies]
+          serde = { version = "1", features = ["derive"] }
+          serde_json = "1"
+          anyhow = "1"
+          STUB_EOF
+          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
 
       - name: Checkout Tomato-Novel-Official-API (private)
         uses: actions/checkout@v4
