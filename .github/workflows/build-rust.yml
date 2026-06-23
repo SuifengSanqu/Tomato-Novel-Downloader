@@ -28,13 +28,18 @@ jobs:
           repository: zhongbai2333/Tomato-Novel-Official-API
           token: ${{ secrets.OAPI }}
           path: Tomato-Novel-Official-API
+        continue-on-error: true
 
-      - name: Link Official-API for path dependency
+      - name: Setup Official-API and detect availability
         shell: bash
         run: |
-          set -euo pipefail
-          rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-          ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
+            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
+            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+            echo "HAS_API=1" >> "$GITHUB_ENV"
+          else
+            echo "HAS_API=0" >> "$GITHUB_ENV"
+          fi
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -69,7 +74,13 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Build release binary
-        run: cargo build --release
+        shell: bash
+        run: |
+          if [ "$HAS_API" = "1" ]; then
+            cargo build --release
+          else
+            cargo build --release --no-default-features --features tts,clipboard,clipboard-arboard
+          fi
 
       - name: Bundle artifacts
         shell: bash
@@ -98,13 +109,18 @@ jobs:
           repository: zhongbai2333/Tomato-Novel-Official-API
           token: ${{ secrets.OAPI }}
           path: Tomato-Novel-Official-API
+        continue-on-error: true
 
-      - name: Link Official-API for path dependency
+      - name: Setup Official-API and detect availability
         shell: bash
         run: |
-          set -euo pipefail
-          rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-          ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
+            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
+            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+            echo "HAS_API=1" >> "$GITHUB_ENV"
+          else
+            echo "HAS_API=0" >> "$GITHUB_ENV"
+          fi
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -148,7 +164,13 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Build release binary (musl)
-        run: cargo build --release --target x86_64-unknown-linux-musl --no-default-features --features official-api,tts-native,clipboard
+        shell: bash
+        run: |
+          if [ "$HAS_API" = "1" ]; then
+            cargo build --release --target x86_64-unknown-linux-musl --no-default-features --features official-api,tts-native,clipboard
+          else
+            cargo build --release --target x86_64-unknown-linux-musl --no-default-features --features tts-native,clipboard
+          fi
 
       - name: Bundle artifacts
         shell: bash
@@ -177,13 +199,18 @@ jobs:
           repository: zhongbai2333/Tomato-Novel-Official-API
           token: ${{ secrets.OAPI }}
           path: Tomato-Novel-Official-API
+        continue-on-error: true
 
-      - name: Link Official-API for path dependency
+      - name: Setup Official-API and detect availability
         shell: bash
         run: |
-          set -euo pipefail
-          rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-          ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
+            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
+            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+            echo "HAS_API=1" >> "$GITHUB_ENV"
+          else
+            echo "HAS_API=0" >> "$GITHUB_ENV"
+          fi
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -227,7 +254,13 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Build release binary (musl arm64)
-        run: cargo build --release --target aarch64-unknown-linux-musl --no-default-features --features official-api,tts-native,clipboard
+        shell: bash
+        run: |
+          if [ "$HAS_API" = "1" ]; then
+            cargo build --release --target aarch64-unknown-linux-musl --no-default-features --features official-api,tts-native,clipboard
+          else
+            cargo build --release --target aarch64-unknown-linux-musl --no-default-features --features tts-native,clipboard
+          fi
 
       - name: Bundle artifacts
         shell: bash
@@ -256,13 +289,18 @@ jobs:
           repository: zhongbai2333/Tomato-Novel-Official-API
           token: ${{ secrets.OAPI }}
           path: Tomato-Novel-Official-API
+        continue-on-error: true
 
-      - name: Link Official-API for path dependency
+      - name: Setup Official-API and detect availability
         shell: bash
         run: |
-          set -euo pipefail
-          rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-          ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
+            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
+            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+            echo "HAS_API=1" >> "$GITHUB_ENV"
+          else
+            echo "HAS_API=0" >> "$GITHUB_ENV"
+          fi
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -297,7 +335,13 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Build release binary
-        run: cargo build --release
+        shell: bash
+        run: |
+          if [ "$HAS_API" = "1" ]; then
+            cargo build --release
+          else
+            cargo build --release --no-default-features --features tts,clipboard,clipboard-arboard
+          fi
 
       - name: Bundle artifacts
         shell: bash
@@ -326,13 +370,18 @@ jobs:
           repository: zhongbai2333/Tomato-Novel-Official-API
           token: ${{ secrets.OAPI }}
           path: Tomato-Novel-Official-API
+        continue-on-error: true
 
-      - name: Link Official-API for path dependency
+      - name: Setup Official-API and detect availability
         shell: bash
         run: |
-          set -euo pipefail
-          rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-          ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
+            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
+            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+            echo "HAS_API=1" >> "$GITHUB_ENV"
+          else
+            echo "HAS_API=0" >> "$GITHUB_ENV"
+          fi
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -395,7 +444,13 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Build release binary (android arm64)
-        run: cargo build --release --target aarch64-linux-android --no-default-features --features official-api,tts-native,clipboard
+        shell: bash
+        run: |
+          if [ "$HAS_API" = "1" ]; then
+            cargo build --release --target aarch64-linux-android --no-default-features --features official-api,tts-native,clipboard
+          else
+            cargo build --release --target aarch64-linux-android --no-default-features --features tts-native,clipboard
+          fi
 
       - name: Bundle artifacts
         shell: bash
@@ -424,13 +479,18 @@ jobs:
           repository: zhongbai2333/Tomato-Novel-Official-API
           token: ${{ secrets.OAPI }}
           path: Tomato-Novel-Official-API
+        continue-on-error: true
 
-      - name: Link Official-API for path dependency
+      - name: Setup Official-API and detect availability
         shell: bash
         run: |
-          set -euo pipefail
-          rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-          ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
+            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
+            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+            echo "HAS_API=1" >> "$GITHUB_ENV"
+          else
+            echo "HAS_API=0" >> "$GITHUB_ENV"
+          fi
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -493,7 +553,13 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Build release binary (android arm32)
-        run: cargo build --release --target armv7-linux-androideabi --no-default-features --features official-api,tts-native,clipboard
+        shell: bash
+        run: |
+          if [ "$HAS_API" = "1" ]; then
+            cargo build --release --target armv7-linux-androideabi --no-default-features --features official-api,tts-native,clipboard
+          else
+            cargo build --release --target armv7-linux-androideabi --no-default-features --features tts-native,clipboard
+          fi
 
       - name: Bundle artifacts
         shell: bash
@@ -522,13 +588,19 @@ jobs:
           repository: zhongbai2333/Tomato-Novel-Official-API
           token: ${{ secrets.OAPI }}
           path: Tomato-Novel-Official-API
+        continue-on-error: true
 
-      - name: Link Official-API for path dependency
+      - name: Setup Official-API and detect availability
         shell: powershell
         run: |
-          $link = Join-Path $env:GITHUB_WORKSPACE '..\Tomato-Novel-Official-API'
-          if (Test-Path $link) { Remove-Item -Recurse -Force $link }
-          New-Item -ItemType Junction -Path $link -Target (Join-Path $env:GITHUB_WORKSPACE 'Tomato-Novel-Official-API') | Out-Null
+          if (Test-Path "Tomato-Novel-Official-API/Cargo.toml") {
+            $link = Join-Path $env:GITHUB_WORKSPACE '..\Tomato-Novel-Official-API'
+            if (Test-Path $link) { Remove-Item -Recurse -Force $link }
+            New-Item -ItemType Junction -Path $link -Target (Join-Path $env:GITHUB_WORKSPACE 'Tomato-Novel-Official-API') | Out-Null
+            echo "HAS_API=1" >> $env:GITHUB_ENV
+          } else {
+            echo "HAS_API=0" >> $env:GITHUB_ENV
+          }
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -563,7 +635,13 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Build release binary
-        run: cargo build --release
+        shell: powershell
+        run: |
+          if ($env:HAS_API -eq "1") {
+            cargo build --release
+          } else {
+            cargo build --release --no-default-features --features tts,clipboard,clipboard-arboard
+          }
 
       - name: Bundle artifacts
         shell: bash
@@ -592,13 +670,19 @@ jobs:
           repository: zhongbai2333/Tomato-Novel-Official-API
           token: ${{ secrets.OAPI }}
           path: Tomato-Novel-Official-API
+        continue-on-error: true
 
-      - name: Link Official-API for path dependency
+      - name: Setup Official-API and detect availability
         shell: powershell
         run: |
-          $link = Join-Path $env:GITHUB_WORKSPACE '..\Tomato-Novel-Official-API'
-          if (Test-Path $link) { Remove-Item -Recurse -Force $link }
-          New-Item -ItemType Junction -Path $link -Target (Join-Path $env:GITHUB_WORKSPACE 'Tomato-Novel-Official-API') | Out-Null
+          if (Test-Path "Tomato-Novel-Official-API/Cargo.toml") {
+            $link = Join-Path $env:GITHUB_WORKSPACE '..\Tomato-Novel-Official-API'
+            if (Test-Path $link) { Remove-Item -Recurse -Force $link }
+            New-Item -ItemType Junction -Path $link -Target (Join-Path $env:GITHUB_WORKSPACE 'Tomato-Novel-Official-API') | Out-Null
+            echo "HAS_API=1" >> $env:GITHUB_ENV
+          } else {
+            echo "HAS_API=0" >> $env:GITHUB_ENV
+          }
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -633,7 +717,13 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Build release binary
-        run: cargo build --release
+        shell: powershell
+        run: |
+          if ($env:HAS_API -eq "1") {
+            cargo build --release
+          } else {
+            cargo build --release --no-default-features --features tts,clipboard,clipboard-arboard
+          }
 
       - name: Bundle artifacts
         shell: bash
@@ -662,13 +752,18 @@ jobs:
           repository: zhongbai2333/Tomato-Novel-Official-API
           token: ${{ secrets.OAPI }}
           path: Tomato-Novel-Official-API
+        continue-on-error: true
 
-      - name: Link Official-API for path dependency
+      - name: Setup Official-API and detect availability
         shell: bash
         run: |
-          set -euo pipefail
-          rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-          ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
+            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
+            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+            echo "HAS_API=1" >> "$GITHUB_ENV"
+          else
+            echo "HAS_API=0" >> "$GITHUB_ENV"
+          fi
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -703,7 +798,13 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Build release binary
-        run: cargo build --release
+        shell: bash
+        run: |
+          if [ "$HAS_API" = "1" ]; then
+            cargo build --release
+          else
+            cargo build --release --no-default-features --features tts,clipboard,clipboard-arboard
+          fi
 
       - name: Bundle artifacts
         shell: bash
@@ -732,13 +833,18 @@ jobs:
           repository: zhongbai2333/Tomato-Novel-Official-API
           token: ${{ secrets.OAPI }}
           path: Tomato-Novel-Official-API
+        continue-on-error: true
 
-      - name: Link Official-API for path dependency
+      - name: Setup Official-API and detect availability
         shell: bash
         run: |
-          set -euo pipefail
-          rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-          ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
+            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
+            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+            echo "HAS_API=1" >> "$GITHUB_ENV"
+          else
+            echo "HAS_API=0" >> "$GITHUB_ENV"
+          fi
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -775,7 +881,13 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Build release binary (macOS amd64)
-        run: cargo build --release --target x86_64-apple-darwin --no-default-features --features official-api,tts-native,clipboard,clipboard-arboard
+        shell: bash
+        run: |
+          if [ "$HAS_API" = "1" ]; then
+            cargo build --release --target x86_64-apple-darwin --no-default-features --features official-api,tts-native,clipboard,clipboard-arboard
+          else
+            cargo build --release --target x86_64-apple-darwin --no-default-features --features tts-native,clipboard,clipboard-arboard
+          fi
 
       - name: Bundle artifacts
         shell: bash
@@ -924,6 +1036,18 @@ jobs:
           repository: zhongbai2333/Tomato-Novel-Official-API
           token: ${{ secrets.OAPI }}
           path: Tomato-Novel-Official-API
+        continue-on-error: true
+
+      - name: Setup Official-API and detect availability
+        shell: bash
+        run: |
+          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
+            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
+            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+            echo "HAS_API=1" >> "$GITHUB_ENV"
+          else
+            echo "HAS_API=0" >> "$GITHUB_ENV"
+          fi
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -974,6 +1098,18 @@ jobs:
           repository: zhongbai2333/Tomato-Novel-Official-API
           token: ${{ secrets.OAPI }}
           path: Tomato-Novel-Official-API
+        continue-on-error: true
+
+      - name: Setup Official-API and detect availability
+        shell: bash
+        run: |
+          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
+            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
+            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
+            echo "HAS_API=1" >> "$GITHUB_ENV"
+          else
+            echo "HAS_API=0" >> "$GITHUB_ENV"
+          fi
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
