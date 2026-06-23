@@ -3438,7 +3438,6 @@ dependencies = [
  "time 0.3.47",
  "tokio",
  "tokio-util",
- "tomato-novel-official-api",
  "tracing",
  "tracing-appender",
  "tracing-subscriber",
@@ -3446,16 +3445,6 @@ dependencies = [
  "uuid",
  "winres",
  "zip",
-]
-
-[[package]]
-name = "tomato-novel-official-api"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "reqwest",
- "serde",
- "serde_json",
 ]
 
 [[package]]

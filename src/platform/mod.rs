@@ -6,20 +6,19 @@
 //! 模块结构:
 //! - `model`  — 平台无关的共享数据模型
 //! - `registry` — 平台注册表,支持多平台并行搜索聚合
-//! - `fanqie`  — 番茄小说适配器(基于 tomato-novel-official-api)
+//! - `fanqie`  — 番茄小说适配器(基于直接 HTTP 调用公开 API)
 //! - `qimao`   — 七猫免费小说适配器(基于 web scraping)
 //! - `scraper` — 通用 web 爬取工具
 
 pub mod model;
 pub mod registry;
 
-#[cfg(feature = "official-api")]
 pub mod fanqie;
 
 pub mod qimao;
 pub mod scraper;
 
-pub use model::{ChapterContent, ChapterState, NovelDetail, NovelId, PlatformId, PlatformMeta, SearchResult};
+pub use model::{ChapterContent, NovelDetail, NovelId, PlatformId, PlatformMeta, SearchResult};
 pub use registry::PlatformRegistry;
 
 use anyhow::Result;

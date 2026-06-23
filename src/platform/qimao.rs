@@ -11,7 +11,7 @@ use anyhow::{Context, Result, bail};
 use regex::Regex;
 
 use super::model::{
-    ChapterContent, ChapterRef, ChapterState, NovelDetail, NovelId, PlatformMeta, SearchResult,
+    ChapterContent, ChapterRef, NovelDetail, NovelId, PlatformMeta, SearchResult,
 };
 use super::scraper::ScraperClient;
 use super::NovelPlatform;

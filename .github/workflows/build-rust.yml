@@ -22,41 +22,6 @@ jobs:
       - name: Checkout A Repository
         uses: actions/checkout@v4
 
-      - name: Create API crate stub (ensures path resolution)
-        shell: bash
-        run: |
-          mkdir -p ../Tomato-Novel-Official-API/src
-          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
-          [package]
-          name = "tomato-novel-official-api"
-          version = "0.1.0"
-          edition = "2021"
-          [dependencies]
-          serde = { version = "1", features = ["derive"] }
-          serde_json = "1"
-          anyhow = "1"
-          STUB_EOF
-          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
-
-      - name: Checkout Tomato-Novel-Official-API (private)
-        uses: actions/checkout@v4
-        with:
-          repository: zhongbai2333/Tomato-Novel-Official-API
-          token: ${{ secrets.OAPI }}
-          path: Tomato-Novel-Official-API
-        continue-on-error: true
-
-      - name: Setup Official-API and detect availability
-        shell: bash
-        run: |
-          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
-            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
-            echo "HAS_API=1" >> "$GITHUB_ENV"
-          else
-            echo "HAS_API=0" >> "$GITHUB_ENV"
-          fi
-
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
         shell: bash
@@ -84,19 +49,13 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-            Tomato-Novel-Official-API/target
           key: ${{ runner.os }}-cargo-${{ steps.cargo-lock-hash.outputs.hash }}
           restore-keys: |
             ${{ runner.os }}-cargo-
 
       - name: Build release binary
         shell: bash
-        run: |
-          if [ "$HAS_API" = "1" ]; then
-            cargo build --release
-          else
-            cargo build --release --no-default-features --features tts,clipboard,clipboard-arboard
-          fi
+        run: cargo build --release
 
       - name: Bundle artifacts
         shell: bash
@@ -118,41 +77,6 @@ jobs:
     steps:
       - name: Checkout A Repository
         uses: actions/checkout@v4
-
-      - name: Create API crate stub (ensures path resolution)
-        shell: bash
-        run: |
-          mkdir -p ../Tomato-Novel-Official-API/src
-          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
-          [package]
-          name = "tomato-novel-official-api"
-          version = "0.1.0"
-          edition = "2021"
-          [dependencies]
-          serde = { version = "1", features = ["derive"] }
-          serde_json = "1"
-          anyhow = "1"
-          STUB_EOF
-          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
-
-      - name: Checkout Tomato-Novel-Official-API (private)
-        uses: actions/checkout@v4
-        with:
-          repository: zhongbai2333/Tomato-Novel-Official-API
-          token: ${{ secrets.OAPI }}
-          path: Tomato-Novel-Official-API
-        continue-on-error: true
-
-      - name: Setup Official-API and detect availability
-        shell: bash
-        run: |
-          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
-            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
-            echo "HAS_API=1" >> "$GITHUB_ENV"
-          else
-            echo "HAS_API=0" >> "$GITHUB_ENV"
-          fi
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -190,19 +114,13 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-            Tomato-Novel-Official-API/target
           key: ${{ runner.os }}-cargo-${{ steps.cargo-lock-hash.outputs.hash }}-musl
           restore-keys: |
             ${{ runner.os }}-cargo-
 
       - name: Build release binary (musl)
         shell: bash
-        run: |
-          if [ "$HAS_API" = "1" ]; then
-            cargo build --release --target x86_64-unknown-linux-musl --no-default-features --features official-api,tts-native,clipboard
-          else
-            cargo build --release --target x86_64-unknown-linux-musl --no-default-features --features tts-native,clipboard
-          fi
+        run: cargo build --release --target x86_64-unknown-linux-musl --no-default-features --features tts-native,clipboard
 
       - name: Bundle artifacts
         shell: bash
@@ -224,41 +142,6 @@ jobs:
     steps:
       - name: Checkout A Repository
         uses: actions/checkout@v4
-
-      - name: Create API crate stub (ensures path resolution)
-        shell: bash
-        run: |
-          mkdir -p ../Tomato-Novel-Official-API/src
-          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
-          [package]
-          name = "tomato-novel-official-api"
-          version = "0.1.0"
-          edition = "2021"
-          [dependencies]
-          serde = { version = "1", features = ["derive"] }
-          serde_json = "1"
-          anyhow = "1"
-          STUB_EOF
-          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
-
-      - name: Checkout Tomato-Novel-Official-API (private)
-        uses: actions/checkout@v4
-        with:
-          repository: zhongbai2333/Tomato-Novel-Official-API
-          token: ${{ secrets.OAPI }}
-          path: Tomato-Novel-Official-API
-        continue-on-error: true
-
-      - name: Setup Official-API and detect availability
-        shell: bash
-        run: |
-          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
-            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
-            echo "HAS_API=1" >> "$GITHUB_ENV"
-          else
-            echo "HAS_API=0" >> "$GITHUB_ENV"
-          fi
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -296,19 +179,13 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-            Tomato-Novel-Official-API/target
           key: ${{ runner.os }}-cargo-${{ steps.cargo-lock-hash.outputs.hash }}-musl-arm64
           restore-keys: |
             ${{ runner.os }}-cargo-
 
       - name: Build release binary (musl arm64)
         shell: bash
-        run: |
-          if [ "$HAS_API" = "1" ]; then
-            cargo build --release --target aarch64-unknown-linux-musl --no-default-features --features official-api,tts-native,clipboard
-          else
-            cargo build --release --target aarch64-unknown-linux-musl --no-default-features --features tts-native,clipboard
-          fi
+        run: cargo build --release --target aarch64-unknown-linux-musl --no-default-features --features tts-native,clipboard
 
       - name: Bundle artifacts
         shell: bash
@@ -330,41 +207,6 @@ jobs:
     steps:
       - name: Checkout A Repository
         uses: actions/checkout@v4
-
-      - name: Create API crate stub (ensures path resolution)
-        shell: bash
-        run: |
-          mkdir -p ../Tomato-Novel-Official-API/src
-          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
-          [package]
-          name = "tomato-novel-official-api"
-          version = "0.1.0"
-          edition = "2021"
-          [dependencies]
-          serde = { version = "1", features = ["derive"] }
-          serde_json = "1"
-          anyhow = "1"
-          STUB_EOF
-          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
-
-      - name: Checkout Tomato-Novel-Official-API (private)
-        uses: actions/checkout@v4
-        with:
-          repository: zhongbai2333/Tomato-Novel-Official-API
-          token: ${{ secrets.OAPI }}
-          path: Tomato-Novel-Official-API
-        continue-on-error: true
-
-      - name: Setup Official-API and detect availability
-        shell: bash
-        run: |
-          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
-            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
-            echo "HAS_API=1" >> "$GITHUB_ENV"
-          else
-            echo "HAS_API=0" >> "$GITHUB_ENV"
-          fi
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -393,19 +235,13 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-            Tomato-Novel-Official-API/target
           key: ${{ runner.os }}-cargo-${{ steps.cargo-lock-hash.outputs.hash }}
           restore-keys: |
             ${{ runner.os }}-cargo-
 
       - name: Build release binary
         shell: bash
-        run: |
-          if [ "$HAS_API" = "1" ]; then
-            cargo build --release
-          else
-            cargo build --release --no-default-features --features tts,clipboard,clipboard-arboard
-          fi
+        run: cargo build --release
 
       - name: Bundle artifacts
         shell: bash
@@ -427,41 +263,6 @@ jobs:
     steps:
       - name: Checkout A Repository
         uses: actions/checkout@v4
-
-      - name: Create API crate stub (ensures path resolution)
-        shell: bash
-        run: |
-          mkdir -p ../Tomato-Novel-Official-API/src
-          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
-          [package]
-          name = "tomato-novel-official-api"
-          version = "0.1.0"
-          edition = "2021"
-          [dependencies]
-          serde = { version = "1", features = ["derive"] }
-          serde_json = "1"
-          anyhow = "1"
-          STUB_EOF
-          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
-
-      - name: Checkout Tomato-Novel-Official-API (private)
-        uses: actions/checkout@v4
-        with:
-          repository: zhongbai2333/Tomato-Novel-Official-API
-          token: ${{ secrets.OAPI }}
-          path: Tomato-Novel-Official-API
-        continue-on-error: true
-
-      - name: Setup Official-API and detect availability
-        shell: bash
-        run: |
-          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
-            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
-            echo "HAS_API=1" >> "$GITHUB_ENV"
-          else
-            echo "HAS_API=0" >> "$GITHUB_ENV"
-          fi
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -518,19 +319,13 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-            Tomato-Novel-Official-API/target
           key: ${{ runner.os }}-cargo-${{ steps.cargo-lock-hash.outputs.hash }}-android-arm64
           restore-keys: |
             ${{ runner.os }}-cargo-
 
       - name: Build release binary (android arm64)
         shell: bash
-        run: |
-          if [ "$HAS_API" = "1" ]; then
-            cargo build --release --target aarch64-linux-android --no-default-features --features official-api,tts-native,clipboard
-          else
-            cargo build --release --target aarch64-linux-android --no-default-features --features tts-native,clipboard
-          fi
+        run: cargo build --release --target aarch64-linux-android --no-default-features --features tts-native,clipboard
 
       - name: Bundle artifacts
         shell: bash
@@ -552,41 +347,6 @@ jobs:
     steps:
       - name: Checkout A Repository
         uses: actions/checkout@v4
-
-      - name: Create API crate stub (ensures path resolution)
-        shell: bash
-        run: |
-          mkdir -p ../Tomato-Novel-Official-API/src
-          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
-          [package]
-          name = "tomato-novel-official-api"
-          version = "0.1.0"
-          edition = "2021"
-          [dependencies]
-          serde = { version = "1", features = ["derive"] }
-          serde_json = "1"
-          anyhow = "1"
-          STUB_EOF
-          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
-
-      - name: Checkout Tomato-Novel-Official-API (private)
-        uses: actions/checkout@v4
-        with:
-          repository: zhongbai2333/Tomato-Novel-Official-API
-          token: ${{ secrets.OAPI }}
-          path: Tomato-Novel-Official-API
-        continue-on-error: true
-
-      - name: Setup Official-API and detect availability
-        shell: bash
-        run: |
-          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
-            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
-            echo "HAS_API=1" >> "$GITHUB_ENV"
-          else
-            echo "HAS_API=0" >> "$GITHUB_ENV"
-          fi
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -643,19 +403,13 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-            Tomato-Novel-Official-API/target
           key: ${{ runner.os }}-cargo-${{ steps.cargo-lock-hash.outputs.hash }}-android-arm32
           restore-keys: |
             ${{ runner.os }}-cargo-
 
       - name: Build release binary (android arm32)
         shell: bash
-        run: |
-          if [ "$HAS_API" = "1" ]; then
-            cargo build --release --target armv7-linux-androideabi --no-default-features --features official-api,tts-native,clipboard
-          else
-            cargo build --release --target armv7-linux-androideabi --no-default-features --features tts-native,clipboard
-          fi
+        run: cargo build --release --target armv7-linux-androideabi --no-default-features --features tts-native,clipboard
 
       - name: Bundle artifacts
         shell: bash
@@ -678,42 +432,6 @@ jobs:
       - name: Checkout A Repository
         uses: actions/checkout@v4
 
-      - name: Create API crate stub (ensures path resolution)
-        shell: bash
-        run: |
-          mkdir -p ../Tomato-Novel-Official-API/src
-          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
-          [package]
-          name = "tomato-novel-official-api"
-          version = "0.1.0"
-          edition = "2021"
-          [dependencies]
-          serde = { version = "1", features = ["derive"] }
-          serde_json = "1"
-          anyhow = "1"
-          STUB_EOF
-          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
-
-      - name: Checkout Tomato-Novel-Official-API (private)
-        uses: actions/checkout@v4
-        with:
-          repository: zhongbai2333/Tomato-Novel-Official-API
-          token: ${{ secrets.OAPI }}
-          path: Tomato-Novel-Official-API
-        continue-on-error: true
-
-      - name: Setup Official-API and detect availability
-        shell: powershell
-        run: |
-          if (Test-Path "Tomato-Novel-Official-API/Cargo.toml") {
-            $link = Join-Path $env:GITHUB_WORKSPACE '..\Tomato-Novel-Official-API'
-            if (Test-Path $link) { Remove-Item -Recurse -Force $link }
-            New-Item -ItemType Junction -Path $link -Target (Join-Path $env:GITHUB_WORKSPACE 'Tomato-Novel-Official-API') | Out-Null
-            echo "HAS_API=1" >> $env:GITHUB_ENV
-          } else {
-            echo "HAS_API=0" >> $env:GITHUB_ENV
-          }
-
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
         shell: bash
@@ -741,19 +459,13 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-            Tomato-Novel-Official-API/target
           key: ${{ runner.os }}-cargo-${{ steps.cargo-lock-hash.outputs.hash }}
           restore-keys: |
             ${{ runner.os }}-cargo-
 
       - name: Build release binary
         shell: powershell
-        run: |
-          if ($env:HAS_API -eq "1") {
-            cargo build --release
-          } else {
-            cargo build --release --no-default-features --features tts,clipboard,clipboard-arboard
-          }
+        run: cargo build --release
 
       - name: Bundle artifacts
         shell: bash
@@ -776,42 +488,6 @@ jobs:
       - name: Checkout A Repository
         uses: actions/checkout@v4
 
-      - name: Create API crate stub (ensures path resolution)
-        shell: bash
-        run: |
-          mkdir -p ../Tomato-Novel-Official-API/src
-          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
-          [package]
-          name = "tomato-novel-official-api"
-          version = "0.1.0"
-          edition = "2021"
-          [dependencies]
-          serde = { version = "1", features = ["derive"] }
-          serde_json = "1"
-          anyhow = "1"
-          STUB_EOF
-          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
-
-      - name: Checkout Tomato-Novel-Official-API (private)
-        uses: actions/checkout@v4
-        with:
-          repository: zhongbai2333/Tomato-Novel-Official-API
-          token: ${{ secrets.OAPI }}
-          path: Tomato-Novel-Official-API
-        continue-on-error: true
-
-      - name: Setup Official-API and detect availability
-        shell: powershell
-        run: |
-          if (Test-Path "Tomato-Novel-Official-API/Cargo.toml") {
-            $link = Join-Path $env:GITHUB_WORKSPACE '..\Tomato-Novel-Official-API'
-            if (Test-Path $link) { Remove-Item -Recurse -Force $link }
-            New-Item -ItemType Junction -Path $link -Target (Join-Path $env:GITHUB_WORKSPACE 'Tomato-Novel-Official-API') | Out-Null
-            echo "HAS_API=1" >> $env:GITHUB_ENV
-          } else {
-            echo "HAS_API=0" >> $env:GITHUB_ENV
-          }
-
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
         shell: bash
@@ -839,19 +515,13 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-            Tomato-Novel-Official-API/target
           key: ${{ runner.os }}-cargo-${{ steps.cargo-lock-hash.outputs.hash }}-arm64
           restore-keys: |
             ${{ runner.os }}-cargo-
 
       - name: Build release binary
         shell: powershell
-        run: |
-          if ($env:HAS_API -eq "1") {
-            cargo build --release
-          } else {
-            cargo build --release --no-default-features --features tts,clipboard,clipboard-arboard
-          }
+        run: cargo build --release
 
       - name: Bundle artifacts
         shell: bash
@@ -874,41 +544,6 @@ jobs:
       - name: Checkout A Repository
         uses: actions/checkout@v4
 
-      - name: Create API crate stub (ensures path resolution)
-        shell: bash
-        run: |
-          mkdir -p ../Tomato-Novel-Official-API/src
-          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
-          [package]
-          name = "tomato-novel-official-api"
-          version = "0.1.0"
-          edition = "2021"
-          [dependencies]
-          serde = { version = "1", features = ["derive"] }
-          serde_json = "1"
-          anyhow = "1"
-          STUB_EOF
-          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
-
-      - name: Checkout Tomato-Novel-Official-API (private)
-        uses: actions/checkout@v4
-        with:
-          repository: zhongbai2333/Tomato-Novel-Official-API
-          token: ${{ secrets.OAPI }}
-          path: Tomato-Novel-Official-API
-        continue-on-error: true
-
-      - name: Setup Official-API and detect availability
-        shell: bash
-        run: |
-          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
-            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
-            echo "HAS_API=1" >> "$GITHUB_ENV"
-          else
-            echo "HAS_API=0" >> "$GITHUB_ENV"
-          fi
-
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
         shell: bash
@@ -936,19 +571,13 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-            Tomato-Novel-Official-API/target
           key: ${{ runner.os }}-cargo-${{ steps.cargo-lock-hash.outputs.hash }}
           restore-keys: |
             ${{ runner.os }}-cargo-
 
       - name: Build release binary
         shell: bash
-        run: |
-          if [ "$HAS_API" = "1" ]; then
-            cargo build --release
-          else
-            cargo build --release --no-default-features --features tts,clipboard,clipboard-arboard
-          fi
+        run: cargo build --release
 
       - name: Bundle artifacts
         shell: bash
@@ -970,41 +599,6 @@ jobs:
     steps:
       - name: Checkout A Repository
         uses: actions/checkout@v4
-
-      - name: Create API crate stub (ensures path resolution)
-        shell: bash
-        run: |
-          mkdir -p ../Tomato-Novel-Official-API/src
-          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
-          [package]
-          name = "tomato-novel-official-api"
-          version = "0.1.0"
-          edition = "2021"
-          [dependencies]
-          serde = { version = "1", features = ["derive"] }
-          serde_json = "1"
-          anyhow = "1"
-          STUB_EOF
-          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
-
-      - name: Checkout Tomato-Novel-Official-API (private)
-        uses: actions/checkout@v4
-        with:
-          repository: zhongbai2333/Tomato-Novel-Official-API
-          token: ${{ secrets.OAPI }}
-          path: Tomato-Novel-Official-API
-        continue-on-error: true
-
-      - name: Setup Official-API and detect availability
-        shell: bash
-        run: |
-          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
-            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
-            echo "HAS_API=1" >> "$GITHUB_ENV"
-          else
-            echo "HAS_API=0" >> "$GITHUB_ENV"
-          fi
 
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
@@ -1035,19 +629,13 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-            Tomato-Novel-Official-API/target
           key: ${{ runner.os }}-cargo-${{ steps.cargo-lock-hash.outputs.hash }}-amd64
           restore-keys: |
             ${{ runner.os }}-cargo-
 
       - name: Build release binary (macOS amd64)
         shell: bash
-        run: |
-          if [ "$HAS_API" = "1" ]; then
-            cargo build --release --target x86_64-apple-darwin --no-default-features --features official-api,tts-native,clipboard,clipboard-arboard
-          else
-            cargo build --release --target x86_64-apple-darwin --no-default-features --features tts-native,clipboard,clipboard-arboard
-          fi
+        run: cargo build --release --target x86_64-apple-darwin --no-default-features --features tts-native,clipboard,clipboard-arboard
 
       - name: Bundle artifacts
         shell: bash
@@ -1190,41 +778,6 @@ jobs:
       - name: Checkout A Repository
         uses: actions/checkout@v4
 
-      - name: Create API crate stub (ensures path resolution)
-        shell: bash
-        run: |
-          mkdir -p ../Tomato-Novel-Official-API/src
-          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
-          [package]
-          name = "tomato-novel-official-api"
-          version = "0.1.0"
-          edition = "2021"
-          [dependencies]
-          serde = { version = "1", features = ["derive"] }
-          serde_json = "1"
-          anyhow = "1"
-          STUB_EOF
-          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
-
-      - name: Checkout Tomato-Novel-Official-API (private)
-        uses: actions/checkout@v4
-        with:
-          repository: zhongbai2333/Tomato-Novel-Official-API
-          token: ${{ secrets.OAPI }}
-          path: Tomato-Novel-Official-API
-        continue-on-error: true
-
-      - name: Setup Official-API and detect availability
-        shell: bash
-        run: |
-          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
-            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
-            echo "HAS_API=1" >> "$GITHUB_ENV"
-          else
-            echo "HAS_API=0" >> "$GITHUB_ENV"
-          fi
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -1271,41 +824,6 @@ jobs:
     steps:
       - name: Checkout A Repository
         uses: actions/checkout@v4
-
-      - name: Create API crate stub (ensures path resolution)
-        shell: bash
-        run: |
-          mkdir -p ../Tomato-Novel-Official-API/src
-          cat > ../Tomato-Novel-Official-API/Cargo.toml << 'STUB_EOF'
-          [package]
-          name = "tomato-novel-official-api"
-          version = "0.1.0"
-          edition = "2021"
-          [dependencies]
-          serde = { version = "1", features = ["derive"] }
-          serde_json = "1"
-          anyhow = "1"
-          STUB_EOF
-          printf '// stub' > ../Tomato-Novel-Official-API/src/lib.rs
-
-      - name: Checkout Tomato-Novel-Official-API (private)
-        uses: actions/checkout@v4
-        with:
-          repository: zhongbai2333/Tomato-Novel-Official-API
-          token: ${{ secrets.OAPI }}
-          path: Tomato-Novel-Official-API
-        continue-on-error: true
-
-      - name: Setup Official-API and detect availability
-        shell: bash
-        run: |
-          if [ -f "Tomato-Novel-Official-API/Cargo.toml" ]; then
-            rm -rf "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API" || true
-            ln -s "$GITHUB_WORKSPACE/Tomato-Novel-Official-API" "$GITHUB_WORKSPACE/../Tomato-Novel-Official-API"
-            echo "HAS_API=1" >> "$GITHUB_ENV"
-          else
-            echo "HAS_API=0" >> "$GITHUB_ENV"
-          fi
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3

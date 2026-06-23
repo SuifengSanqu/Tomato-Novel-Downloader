@@ -31,14 +31,6 @@ use base_system::logging::{LogOptions, LogSystem};
 use tracing::info;
 use tracing::warn;
 
-#[cfg(all(feature = "official-api", feature = "no-official-api"))]
-compile_error!(
-    "features 'official-api' and 'no-official-api' are mutually exclusive; use exactly one"
-);
-
-#[cfg(feature = "official-api")]
-use tomato_novel_official_api::prewarm_iid;
-
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[derive(Debug, Parser)]
@@ -121,11 +113,9 @@ fn main() -> Result<()> {
     // 构建平台注册表
     let mut registry = platform::PlatformRegistry::new();
 
-    #[cfg(feature = "official-api")]
-    {
-        registry.register(Arc::new(platform::fanqie::FanqiePlatform::new()));
-        info!(target: "startup", "已注册平台: 番茄小说");
-    }
+    // 注册番茄平台
+    registry.register(Arc::new(platform::fanqie::FanqiePlatform::new()?));
+    info!(target: "startup", "已注册平台: 番茄小说");
 
     match platform::qimao::QimaoPlatform::new() {
         Ok(qimao) => {
