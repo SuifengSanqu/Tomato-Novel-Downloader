@@ -14,6 +14,7 @@ use crate::base_system::file_cleaner::is_empty_dir;
 use crate::book_parser::image_utils::ensure_cached_image;
 use crate::download::downloader as dl;
 use crate::network_parser::network::{FanqieWebConfig, FanqieWebNetwork};
+use crate::platform::{NovelId, PlatformRegistry};
 use crate::ui::web::state::AppState;
 
 fn preview_cover_cache_dir() -> PathBuf {
@@ -151,7 +152,42 @@ fn api_error(status: StatusCode, message: impl Into<String>) -> (StatusCode, Jso
 
 pub(crate) async fn api_preview(
     State(state): State<AppState>,
-    Path(book_id): Path<String>,
+    Path(raw_book_id): Path<String>,
+) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
+    // 解析平台限定 ID "platform:raw" 或裸 tomato book_id
+    let novel_id = NovelId::parse(&raw_book_id).unwrap_or_else(|| NovelId::new("fanqie", raw_book_id.clone()));
+
+    // 如果是番茄平台,使用原有逻辑
+    if novel_id.platform == "fanqie" {
+        return api_preview_fanqie(state, novel_id.raw).await;
+    }
+
+    // 其他平台:使用平台注册表获取详情
+    let registry = state.platform_registry.clone();
+    let nid = novel_id.clone();
+    let detail = tokio::task::spawn_blocking(move || registry.fetch_detail(&nid))
+        .await
+        .map_err(|_| api_error(StatusCode::INTERNAL_SERVER_ERROR, "预览任务执行失败"))?
+        .map_err(|err| api_error(StatusCode::BAD_GATEWAY, format!("加载目录失败: {err}")))?;
+
+    Ok(Json(json!({
+        "book_id": novel_id.to_string(),
+        "platform_id": novel_id.platform,
+        "book_name": detail.title,
+        "author": detail.author,
+        "description": detail.intro,
+        "tags": detail.tags,
+        "cover_url": detail.cover_url,
+        "finished": detail.finished,
+        "chapter_count": detail.chapter_count,
+        "word_count": detail.word_count,
+    })))
+}
+
+/// 番茄平台专用预览(保持原有逻辑)
+async fn api_preview_fanqie(
+    state: AppState,
+    book_id: String,
 ) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
     let book_id = tokio::task::spawn_blocking(move || resolve_book_id(&book_id))
         .await

@@ -12,6 +12,7 @@ use uuid::Uuid;
 
 use crate::base_system::context::Config;
 use crate::download::downloader::{BookNameOption, ProgressSnapshot};
+use crate::platform::PlatformRegistry;
 
 #[derive(Clone, Debug)]
 pub(crate) struct ConfigView {
@@ -25,7 +26,7 @@ pub(crate) struct ConfigView {
 pub(crate) struct AppState {
     pub(crate) bind_addrs: Arc<Vec<SocketAddr>>,
     pub(crate) config_view: Arc<ConfigView>,
-    pub(crate) config: Arc<Mutex<Config>>, // allow runtime updates via Web UI
+    pub(crate) config: Arc<Mutex<Config>>,
     pub(crate) config_path: Arc<PathBuf>,
     pub(crate) library_root: Arc<PathBuf>,
     pub(crate) jobs: Arc<JobStore>,
@@ -33,8 +34,7 @@ pub(crate) struct AppState {
     pub(crate) library_scan: Arc<LibraryScanStore>,
     pub(crate) update_scan: Arc<UpdateScanStore>,
     pub(crate) auth: Option<AuthState>,
-    /// 限制同时访问上游 API（search / preview）的并发数，防止 WebUI 被用作多用户 API 代理。
-    /// 仅在启用 official-api feature 时有意义，其他 feature 下置 None。
+    pub(crate) platform_registry: Arc<PlatformRegistry>,
     #[cfg(feature = "official-api")]
     pub(crate) api_semaphore: Arc<tokio::sync::Semaphore>,
 }

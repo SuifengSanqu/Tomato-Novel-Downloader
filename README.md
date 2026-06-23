@@ -1,4 +1,4 @@
-# 番茄小说下载器~~精简版~~
+# 番茄小说下载器~~精简版~~  ->  多平台小说下载器
 
 > 小小推广位：[RustEpubReader](https://github.com/zhongbai2333/RustEpubReader) <- 自研Epub阅读器，轻量快速  声明：阅读器项目不会添加下载器功能
 
@@ -8,18 +8,86 @@
 
 我对其进行重构 + 优化，添加更多功能，包括：EPUB 下载支持、更好的断点续传、更好的错误管理、书本搜索、Web UI 等特性。
 
-本项目支持两种构建模式：
+## 多平台支持
 
-- 默认模式（`official-api`）：保留 Official-API 能力（搜索/目录/段评等），同时也兼容第三方正文模式。
-- No-Official-API 模式（`no-official-api`）：**不依赖 Official-API crate**；目录/书信息走网页解析；**正文强制使用第三方 API 地址池**。
+v2.5+ 引入多平台抽象架构，除番茄小说外已接入更多平台：
 
-为了保证第三方API安全，部分第三方接口相关代码并不开源，包括地址和token，敬请谅解，谢谢！
+| 平台 | ID | 实现方式 | 状态 |
+|------|----|--------|-----|
+| 番茄小说 | `fanqie` | Official API | 完整(搜索+预览+下载) |
+| 七猫免费小说 | `qimao` | Web Scraping | 搜索+预览(下载开发中) |
 
-为方便视障人士使用，我保留了老的CLI界面，接下来是启用方法：
+### 平台 CLI
 
-在第一次打开程序时 按三下 `o` 并回车 或者 按一下下方向键并按三下 `o` 都可以启用老版本CLI界面
+```sh
+# 列出所有已接入平台
+tomato-novel-downloader --list-platforms
 
-注意：切换成功应该会发出 `灯` 的一声
+# 跨平台搜索（默认搜索所有平台）
+tomato-novel-downloader --search "仙逆"
+
+# 限定平台搜索（逗号分隔）
+tomato-novel-downloader --search "仙逆" --platform fanqie,qimao
+```
+
+搜索结果会标注每个条目所属的平台来源。
+
+### 平台抽象架构
+
+新增 `src/platform/` 模块层，定义统一的 `NovelPlatform` trait。上层搜索/预览/下载管线只依赖该 trait，不感知具体平台细节。接入新平台只需实现该 trait 并注册即可。
+
+- **番茄适配器**: 基于 `tomato-novel-official-api`，全功能支持
+- **七猫适配器**: 基于 web scraping(API 优先 + HTML 解析回退)，支持搜索和目录浏览
+
+### 广告解锁免费章节
+
+番茄小说采用广告解锁模式，所有章节本质上免费——观看广告后即可阅读。下载器通过引入浏览器 Cookie(含用户已看广告的凭证)来访问这些章节。操作方式:
+
+1. 从浏览器导出番茄小说(`fanqienovel.com`)的 Cookie
+2. 将 Cookie 配置到下载器
+3. `tomato-novel-official-api` 会自动处理广告凭证续期
+
+这不是破解付费墙，只是用真实用户身份访问免费资源。付费平台的付费章节仍然会跳过。
+
+## 构建模式（Cargo Features）
+
+本项目提供两个互斥的 feature：`official-api` 与 `no-official-api`（两者不能同时启用）。
+
+### 默认模式：official-api（默认启用）
+
+- 构建（默认就会启用）：
+
+```sh
+cargo build --release
+```
+
+- 行为：
+  - 搜索功能可用（TUI / Web UI / 老 CLI 的搜索入口）。
+  - 段评（EPUB 段评页/资源抓取）可用（取决于配置项）。
+  - 正文获取可通过配置在“官方/第三方”之间切换（`use_official_api`）。
+
+### No-Official-API 模式：no-official-api（Issue #187）
+
+- 构建：
+
+```sh
+# Linux/macOS
+cp Cargo_no_official.toml Cargo.toml
+cargo build --release
+
+# Windows
+copy /Y Cargo_no_official.toml Cargo.toml
+cargo build --release
+```
+
+仓库根目录提供了 `Cargo_no_official.toml`，该文件**完全不引用** `tomato-novel-official-api` 路径依赖，适合无法获取该 crate 的用户直接使用。
+
+- 行为差异（重点）：
+  - **不依赖** `tomato-novel-official-api` crate，可在缺少 Official-API 环境时编译。
+  - 目录与书本信息：使用网页解析（`FanqieWebNetwork`）。
+  - **正文获取：强制第三方模式**（忽略/不使用 `use_official_api=true` 的官方分支）。
+  - 搜索功能：不可用（会返回提示/报错）。
+  - 段评：不可用（会被强制关闭）。
 
 ---
 
@@ -123,7 +191,7 @@ Web UI 提供的功能（纯 HTML，无需额外前端构建）：
 - 任务列表/进度刷新/取消任务
 - 下载库按目录浏览（不再把所有文件递归平铺）
 - 文件直接下载
-- 文件夹一键打包为 zip 下载（保持目录结构，适配音频等“文件夹内包含文件夹”的情况）
+- 文件夹一键打包为 zip 下载（保持目录结构，适配音频等"文件夹内包含文件夹"的情况）
 - 配置页面：可在线修改部分下载输出相关配置（会写回 `config.yml`）
 
 注意：Web UI 主要面向自建/局域网使用；如果要暴露到公网，建议放在反向代理/HTTPS 后面，并务必开启密码锁。
@@ -164,48 +232,6 @@ docker run -d \
 ```
 
 可通过 `TOMATO_WEB_ADDR`、`TOMATO_WEB_PASSWORD` 与 `--data-dir` 控制监听地址、密码与数据目录（见上文 Web UI 说明）。
-
----
-
-## 构建模式（Cargo Features）
-
-本项目提供两个互斥的 feature：`official-api` 与 `no-official-api`（两者不能同时启用）。
-
-### 默认模式：official-api（默认启用）
-
-- 构建（默认就会启用）：
-
-```sh
-cargo build --release
-```
-
-- 行为：
-  - 搜索功能可用（TUI / Web UI / 老 CLI 的搜索入口）。
-  - 段评（EPUB 段评页/资源抓取）可用（取决于配置项）。
-  - 正文获取可通过配置在“官方/第三方”之间切换（`use_official_api`）。
-
-### No-Official-API 模式：no-official-api（Issue #187）
-
-- 构建：
-
-```sh
-# Linux/macOS
-cp Cargo_no_official.toml Cargo.toml
-cargo build --release
-
-# Windows
-copy /Y Cargo_no_official.toml Cargo.toml
-cargo build --release
-```
-
-仓库根目录提供了 `Cargo_no_official.toml`，该文件**完全不引用** `tomato-novel-official-api` 路径依赖，适合无法获取该 crate 的用户直接使用。
-
-- 行为差异（重点）：
-  - **不依赖** `tomato-novel-official-api` crate，可在缺少 Official-API 环境时编译。
-  - 目录与书本信息：使用网页解析（`FanqieWebNetwork`）。
-  - **正文获取：强制第三方模式**（忽略/不使用 `use_official_api=true` 的官方分支）。
-  - 搜索功能：不可用（会返回提示/报错）。
-  - 段评：不可用（会被强制关闭）。
 
 ---
 

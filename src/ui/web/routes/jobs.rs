@@ -9,6 +9,7 @@ use serde_json::{Value, json};
 
 use crate::base_system::book_id::resolve_book_id;
 use crate::download::downloader as dl;
+use crate::platform::NovelId;
 use crate::ui::web::state::{AppState, JobState, RECENT_DONE_JOB_RETENTION_MS};
 
 #[derive(Debug, Deserialize)]
@@ -63,7 +64,21 @@ pub(crate) async fn create_job(
     Json(req): Json<CreateJobReq>,
 ) -> Result<Json<Value>, StatusCode> {
     let book_id_raw = req.book_id.clone();
-    let book_id = tokio::task::spawn_blocking(move || resolve_book_id(&book_id_raw))
+
+    // 解析平台限定 ID
+    let novel_id = NovelId::parse(&book_id_raw)
+        .unwrap_or_else(|| NovelId::new("fanqie", book_id_raw.clone()));
+
+    // 非番茄平台:暂不支持通过旧下载管线下载
+    if novel_id.platform != "fanqie" {
+        tracing::warn!(
+            platform = novel_id.platform,
+            "非番茄平台下载尚不支持,请求被拒绝"
+        );
+        return Err(StatusCode::NOT_IMPLEMENTED);
+    }
+
+    let book_id = tokio::task::spawn_blocking(move || resolve_book_id(&novel_id.raw))
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         .ok_or(StatusCode::BAD_REQUEST)?;

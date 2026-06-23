@@ -13,6 +13,7 @@ use anyhow::{Result, anyhow};
 use tracing::{info, warn};
 
 use crate::base_system::context::Config;
+use crate::platform::PlatformRegistry;
 use state::{AppState, AuthState, ConfigView, JobStore, LibraryScanStore};
 
 pub fn run(
@@ -20,6 +21,7 @@ pub fn run(
     password: Option<String>,
     config_path: PathBuf,
     cookie_secure: bool,
+    platform_registry: Arc<PlatformRegistry>,
 ) -> Result<()> {
     let bind_raw = std::env::var("TOMATO_WEB_ADDR").unwrap_or_else(|_| DEFAULT_BIND.to_string());
     let bind_addrs: Vec<SocketAddr> = parse_bind_addrs(&bind_raw)?;
@@ -55,6 +57,7 @@ pub fn run(
         config_path,
         library_root,
         auth,
+        platform_registry,
     ))
 }
 
@@ -130,6 +133,7 @@ async fn run_async(
     config_path: PathBuf,
     library_root: PathBuf,
     auth: Option<AuthState>,
+    platform_registry: Arc<crate::platform::PlatformRegistry>,
 ) -> Result<()> {
     let state = AppState {
         bind_addrs: Arc::new(bind_addrs.clone()),
@@ -142,8 +146,7 @@ async fn run_async(
         library_scan: Arc::new(LibraryScanStore::default()),
         update_scan: Arc::new(state::UpdateScanStore::default()),
         auth,
-        // 最多允许 2 个并发的上游 API 请求（search / preview），
-        // 单用户正常使用完全够用，SaaS 滥用场景下无法并发服务多用户。
+        platform_registry,
         #[cfg(feature = "official-api")]
         api_semaphore: Arc::new(tokio::sync::Semaphore::new(2)),
     };

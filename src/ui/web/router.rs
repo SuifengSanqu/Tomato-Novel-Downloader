@@ -69,7 +69,8 @@ pub(crate) fn build_router(state: AppState) -> Router {
             post(routes::jobs::submit_format_choice),
         )
         .route("/api/updates", get(routes::updates::api_updates))
-        .route("/api/history", get(routes::history::api_history));
+        .route("/api/history", get(routes::history::api_history))
+        .route("/api/platforms", get(routes::platforms::api_platforms));
 
     protected
         .layer(from_fn_with_state(state.clone(), auth_and_log_mw))

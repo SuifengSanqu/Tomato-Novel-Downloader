@@ -5,6 +5,7 @@ pub(crate) mod history;
 pub(crate) mod index;
 pub(crate) mod jobs;
 pub(crate) mod library;
+pub(crate) mod platforms;
 pub(crate) mod preview;
 pub(crate) mod search;
 pub(crate) mod status;

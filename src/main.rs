@@ -1,22 +1,26 @@
-//! Tomato Novel Downloader（番茄小说下载器）Rust 实现。
+//! 番茄/七猫等多平台小说下载器 Rust 实现。
 //!
-//! 本 crate 负责：配置加载、交互界面（TUI/CLI）、下载调度、内容解析与导出（txt/epub/有声书等）。
+//! 本 crate 负责：配置加载、交互界面（TUI/CLI/Web）、多平台搜索、下载调度、
+//! 内容解析与导出（txt/epub/有声书等）。
 //!
 //! 代码结构（读代码入口）：
+//! - `platform`：多平台抽象层（trait + 注册表 + 各平台适配器）
 //! - `base_system`：配置/日志/重试/路径等基础设施
 //! - `download`：下载流程编排（拉目录、拉内容、冷却/重试等）
 //! - `book_parser`：解析与导出（epub/txt/媒体/有声书）
-//! - `ui`：TUI 与无 UI（old cli）两套交互
+//! - `ui`：TUI / Web / 无 UI（old cli）三套交互
 //! - `prewarm_state`：启动预热状态（与 UI 协作显示）
 
 use anyhow::{Result, anyhow};
 use clap::Parser;
+use std::sync::Arc;
 use std::thread;
 
 mod base_system;
 mod book_parser;
 mod download;
 mod network_parser;
+mod platform;
 mod prewarm_state;
 mod third_party;
 mod ui;
@@ -25,7 +29,6 @@ use base_system::config::{ConfigSpec, load_or_create, load_or_create_with_base};
 use base_system::context::Config;
 use base_system::logging::{LogOptions, LogSystem};
 use tracing::info;
-#[cfg(feature = "official-api")]
 use tracing::warn;
 
 #[cfg(all(feature = "official-api", feature = "no-official-api"))]
@@ -40,7 +43,7 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[derive(Debug, Parser)]
 #[command(name = "tomato-novel-downloader")]
-#[command(about = "Tomato Novel Downloader (Rust TUI)")]
+#[command(about = "多平台小说下载器 - 支持番茄、七猫等平台")]
 struct Cli {
     /// 启用调试日志输出
     #[arg(long, default_value_t = false)]
@@ -82,6 +85,18 @@ struct Cli {
     #[arg(long)]
     update: Option<String>,
 
+    /// 按关键字跨平台搜索小说（非交互模式，输出 JSON）
+    #[arg(long)]
+    search: Option<String>,
+
+    /// 限制搜索的平台(逗号分隔,如 "fanqie,qimao",为空则搜索全部)
+    #[arg(long, default_value = "")]
+    platform: String,
+
+    /// 列出所有已接入的平台
+    #[arg(long, default_value_t = false)]
+    list_platforms: bool,
+
     /// 非交互模式下失败章节重试一次
     #[arg(long, default_value_t = false)]
     retry_failed: bool,
@@ -103,6 +118,61 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
+    // 构建平台注册表
+    let mut registry = platform::PlatformRegistry::new();
+
+    #[cfg(feature = "official-api")]
+    {
+        registry.register(Arc::new(platform::fanqie::FanqiePlatform::new()));
+        info!(target: "startup", "已注册平台: 番茄小说");
+    }
+
+    match platform::qimao::QimaoPlatform::new() {
+        Ok(qimao) => {
+            registry.register(Arc::new(qimao));
+            info!(target: "startup", "已注册平台: 七猫免费小说");
+        }
+        Err(e) => {
+            warn!(target: "startup", "七猫平台初始化失败({}),已跳过", e);
+        }
+    }
+
+    if cli.list_platforms {
+        println!("已接入平台:");
+        for (id, name, domain) in registry.list_all() {
+            println!("  - {name} ({id})  ->  https://{domain}");
+        }
+        if registry.is_empty() {
+            println!("  (无可用平台:请确保已启用 official-api feature 或网络连通)");
+        }
+        return Ok(());
+    }
+
+    if let Some(keyword) = cli.search.as_deref() {
+        let only: Vec<String> = if cli.platform.is_empty() {
+            Vec::new()
+        } else {
+            cli.platform.split(',').map(|s| s.trim().to_string()).collect()
+        };
+        let results = registry.search_across(keyword, &only);
+        if results.is_empty() {
+            println!("未搜索到相关作品。");
+        } else {
+            println!("搜索 \"{keyword}\" 结果:\n");
+            for r in &results {
+                println!(
+                    "  [{}] {} - {} (ID: {})",
+                    r.platform_name, r.title, r.author, r.id.raw
+                );
+                if let Some(ref intro) = r.intro {
+                    println!("      简介: {intro}");
+                }
+                println!();
+            }
+        }
+        return Ok(());
+    }
+
     if cli.download.is_some() && cli.update.is_some() {
         return Err(anyhow!("--download 和 --update 不能同时使用"));
     }
@@ -115,8 +185,6 @@ fn main() -> Result<()> {
     thread::spawn(|| {
         #[cfg(feature = "official-api")]
         {
-            // 注意：这里只应“预热/确保可用”，不得在每次启动时强制更换 IID。
-            // `prewarm_iid()` 现在会优先复用本地文件缓存，仅在缓存缺失或过期时才注册新的 IID。
             match prewarm_iid() {
                 Ok(_) => info!(target: "startup", "IID 预热完成"),
                 Err(err) => {
@@ -170,6 +238,7 @@ fn main() -> Result<()> {
             password,
             config_path_from_data_dir(data_dir),
             cookie_secure,
+            Arc::new(registry),
         );
     }
 
@@ -182,7 +251,6 @@ fn main() -> Result<()> {
         match ui::tui::run(config)? {
             ui::tui::TuiExit::Quit => return Ok(()),
             ui::tui::TuiExit::SwitchToOldCli => {
-                // 模拟“重启”：重新从磁盘加载配置，然后进入 noui
                 config = load_config_from_data_dir(data_dir)?;
                 config.old_cli = true;
             }
